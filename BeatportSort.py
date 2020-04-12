@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from pathlib import Path
+import sys
 from sys import argv
 import shutil
 import os
@@ -12,10 +13,10 @@ except ImportError:
 
 def getURL(query):
     query = "Beatport " + query
-
-    for j in search(query, tld="com", num=1, stop=1, pause=2):
-        url = j
-    return url
+    for url in search(query, tld="com", num=1, stop=1, pause=2):
+        return url
+    else:
+        return "failed"
 
 
 def getGenre(url):
@@ -29,31 +30,35 @@ def getGenre(url):
         return 'GENRE NOT FOUND'
 
 
-def getFilenames(path):
+def getFilenames(path, filetype):
     fileDirectorys = []
     fileNames = []
     # taken from: https://mkyong.com/python/python-how-to-list-all-files-in-a-directory/
     # r=root, d=directories, f = files
-    for r, d, f in os.walk(path):
+    for r, _, f in os.walk(path):
         for file in f:
-            if '.mp3' in file:
+            if filetype in file:
                 fileDirectorys.append(os.path.join(r, file))
 
     for f in fileDirectorys:
-        filename = f.split('/')[-1].split('.mp3')[0]
+        filename = f.split('/')[-1].split(filetype)[0]
         fileNames.append(filename)
 
     return fileDirectorys, fileNames
 
 
-def sortFiles():
-    directorys, names = getFilenames(argv[1])
+def sortFiles(path, filetype):
+    directorys, names = getFilenames(path, filetype)
     for name, directory in zip(names, directorys):
-        genre = getGenre(getURL(name))
-        print("{0}:     {1}".format(name, genre))
+        url = getURL(name)
+        if not url == "failed":
+            genre = getGenre(url)
+        else:
+            genre = "FailedURL"
+        print("{:<17s}:\t{:<10s}".format(genre, name))
         oldPath = directory
         newDirectory = "/Users/MaxPilling/Music/Traktor Music/2020/Electronic/" + genre
-        newPath = newDirectory + "/" + name + ".mp3"
+        newPath = newDirectory + "/" + name + filetype
 
         if not os.path.exists(newDirectory):
             os.makedirs(newDirectory)
@@ -61,4 +66,8 @@ def sortFiles():
         shutil.move(oldPath, newPath)
 
 
-sortFiles()
+if argv[1]:
+    for filetype in [".mp3", ".flac", ".wav", ".m4a"]:
+        sortFiles(argv[1], filetype)
+else:
+    print("please enter a directory")
