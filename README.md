@@ -1,2 +1,2 @@
 # Beatport-Sort
-Sorts music files into Beatport genre folders by querying their websites.
+Sorts music files into Beatport genre folders by querying their Beatport webpage.
