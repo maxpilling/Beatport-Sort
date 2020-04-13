@@ -13,10 +13,12 @@ except ImportError:
 
 def getURL(query):
     query = "Beatport " + query
-    for url in search(query, tld="com", num=1, stop=1, pause=2):
-        return url
+    urls = []
+    for url in search(query, tld="com", num=5, stop=5, pause=2):
+        urls.append[url]
     else:
         return "failed"
+    return urls
 
 
 def getGenre(url):
@@ -50,11 +52,21 @@ def getFilenames(path, filetype):
 def sortFiles(path, filetype):
     directorys, names = getFilenames(path, filetype)
     for name, directory in zip(names, directorys):
-        url = getURL(name)
-        if not url == "failed":
-            genre = getGenre(url)
+        urls = getURL(name)
+        genres = []
+        if not urls == "failed":
+            for url in urls:
+                genres.append[getGenre(url)]
         else:
             genre = "FailedURL"
+
+        genreFound = False
+        while not genreFound:
+            for g in genres:
+                if not (g == 'GENRE NOT FOUND'):
+                    genre = g
+                    genreFound = True
+
         print("{:<17s}:\t{:<10s}".format(genre, name))
         oldPath = directory
         newDirectory = "/Users/MaxPilling/Music/Traktor Music/2020/Electronic/" + genre
