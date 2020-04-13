@@ -14,10 +14,8 @@ except ImportError:
 def getURL(query):
     query = "Beatport " + query
     urls = []
-    for url in search(query, tld="com", num=5, stop=5, pause=2):
-        urls.append[url]
-    else:
-        return "failed"
+    for url in search(query, tld="com", num=1, stop=3, pause=2):
+        urls.append(url)
     return urls
 
 
@@ -54,24 +52,23 @@ def sortFiles(path, filetype):
     for name, directory in zip(names, directorys):
         urls = getURL(name)
         genres = []
-        if not urls == "failed":
+        if not urls == []:
             for url in urls:
-                genres.append[getGenre(url)]
+                urlGenre = getGenre(url)
+                if not urlGenre == "GENRE NOT FOUND":
+                    genres.append(urlGenre)
+            if len(genres) > 0:
+                print(genres)
+                genre = genres[0]
+            else:
+                genre = "GENRE NOT FOUND 2"
         else:
             genre = "FailedURL"
-
-        genreFound = False
-        while not genreFound:
-            for g in genres:
-                if not (g == 'GENRE NOT FOUND'):
-                    genre = g
-                    genreFound = True
 
         print("{:<17s}:\t{:<10s}".format(genre, name))
         oldPath = directory
         newDirectory = "/Users/MaxPilling/Music/Traktor Music/2020/Electronic/" + genre
         newPath = newDirectory + "/" + name + filetype
-
         if not os.path.exists(newDirectory):
             os.makedirs(newDirectory)
 
