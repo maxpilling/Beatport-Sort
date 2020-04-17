@@ -20,14 +20,17 @@ def getURL(query):
 
 
 def getGenre(url):
-    html_doc = requests.get(url)
-    soup = BeautifulSoup(html_doc.text, 'html.parser')
-    li = soup.findAll(
-        'li', {"class": "interior-track-content-item interior-track-genre"})
-    try:
-        return li[0].a.string
-    except IndexError:
-        return 'GENRE NOT FOUND'
+    if "https://www.beatport.com/track/" in url:
+        html_doc = requests.get(url)
+        soup = BeautifulSoup(html_doc.text, 'html.parser')
+        li = soup.findAll(
+            'li', {"class": "interior-track-content-item interior-track-genre"})
+        try:
+            return li[0].a.string
+        except IndexError:
+            return "GENRE NOT FOUND"
+    else:
+        return "BEATPORT LINK NOT FOUND"
 
 
 def getFilenames(path, filetype):
@@ -55,13 +58,13 @@ def sortFiles(path, filetype):
         if not urls == []:
             for url in urls:
                 urlGenre = getGenre(url)
-                if not urlGenre == "GENRE NOT FOUND":
+                if not (urlGenre in ["GENRE NOT FOUND", "BEATPORT LINK NOT FOUND"]):
                     genres.append(urlGenre)
             if len(genres) > 0:
                 print(genres)
                 genre = genres[0]
             else:
-                genre = "GENRE NOT FOUND 2"
+                genre = "GENRE NOT FOUND"
         else:
             genre = "FailedURL"
 
